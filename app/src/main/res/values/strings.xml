@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">StudySpinner</string>
+
+    <string name="technician_picked_to_deal_with_event">Technician Assignment</string>
+    <string name="technician_picked_to_deal_with_event_message">Technician chosen is %1$s, proceed?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+
+</resources>
