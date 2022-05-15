@@ -4,11 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -18,8 +15,6 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
-
-import com.google.gson.Gson;
 
 
 import org.json.JSONArray;
@@ -41,15 +36,9 @@ public class MainActivity extends AppCompatActivity {
 
     ArrayList<String> names ;
 
-    Button btnConfirm;
+    Button btnConfirmTechnicianToEvent;
 
-    Spinner spinner;
-
-    Button btnGetReqeust;
-    Button btnPostReqeust;
-
-
-
+    Spinner spinnerTechnicianNames;
 
 
 
@@ -76,40 +65,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void findViewOfItems() {
-        btnConfirm = findViewById(R.id.btnConfirm);
-        spinner = findViewById(R.id.spinner);
-        btnGetReqeust = findViewById(R.id.btnGetReqeust);
-        btnPostReqeust = findViewById(R.id.btnPostReqeust);
+        btnConfirmTechnicianToEvent = findViewById(R.id.btnConfirmTechnicianToEvent);
+        spinnerTechnicianNames = findViewById(R.id.spinnerTechnicianNames);
+
     }
-
-
-    private void setOnClickListernerServerButtons() {
-        btnGetReqeust.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getTechnicianNamesFromServer();
-
-            }
-        });
-
-
-        btnPostReqeust.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-//                isTechnicianNameLegal();
-                sendTechnicianName("");
-
-            }
-        });
-    }
-
-
-
 
     private void initSpinner() {
 
         getTechnicianNamesFromServer();
-        spinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, names));
+        spinnerTechnicianNames.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, names));
     }
 
     public void getTechnicianNamesFromServer(){
@@ -167,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
             for (int i = 0; i < ja.length(); i++) {
                 names.add(ja.getString(i));
             }
-            spinner.setSelection(0);
+            spinnerTechnicianNames.setSelection(0);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -177,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
     private void initBtnAndAlertWindow() {
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
 
-        btnConfirm.setOnClickListener(new View.OnClickListener() {
+        btnConfirmTechnicianToEvent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(isTechnicianNameLegal()){
@@ -189,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void CallAlertWindow() {
-        String chosenName = spinner.getSelectedItem().toString();
+        String chosenName = spinnerTechnicianNames.getSelectedItem().toString();
 
         String alertMessage = String.format(getString(R.string.technician_picked_to_deal_with_event_message), chosenName);
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
@@ -214,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public boolean isTechnicianNameLegal(){
-        String chosenName = spinner.getSelectedItem().toString();
+        String chosenName = spinnerTechnicianNames.getSelectedItem().toString();
         if(chosenName.equals(getString(R.string.choose_a_technician_name_in_spinner))){
 //            Toast.makeText(this, getString(R.string.user_send_empty_technician_name), Toast.LENGTH_SHORT).show();
             showToastMessage(getString(R.string.user_send_empty_technician_name));
@@ -240,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void sendTechnicianName(String ID_Event){
-        String technicianName = spinner.getSelectedItem().toString();
+        String technicianName = spinnerTechnicianNames.getSelectedItem().toString();
 
 
 
@@ -274,7 +238,7 @@ public class MainActivity extends AppCompatActivity {
                             try {
                                 if(response.body().string().matches("success")){
                                     Toast.makeText(MainActivity.this, getString(R.string.update_info_in_server), Toast.LENGTH_LONG).show();
-                                    finish();//todo test
+//                                    finish();//todo test
                                 }
                             } catch (IOException e) {
                                 e.printStackTrace();
