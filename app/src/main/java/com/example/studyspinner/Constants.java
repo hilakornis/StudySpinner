@@ -118,6 +118,7 @@ public class Constants {
 
             public static class PostRequest {
                 public static String closeEventIronDome = url + urlFolder + "close";
+                public static String updateTechnicianNameToHandleEvent = url + urlFolder + "TechName/update";
             }
         }
 
