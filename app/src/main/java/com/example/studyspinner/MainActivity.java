@@ -105,56 +105,10 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    //todo remove:
-    /*public void getTechnicianNamesFromServer_old(){
-        OkHttpClient client = new OkHttpClient();
-        String url = Constants.Server.Users.GetRequest.getAllUserNamesList;
-        Log.i("ServerResponse","getTechnicianNamesFromServer start");
-
-        Log.i("ServerResponse","url : "+url);
-        Request request = new Request.Builder().url(url).get().build();
-
-
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(@NonNull Call call, @NonNull IOException e) {
-
-            }
-
-            @Override
-            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                if(response.isSuccessful()){
-                    Log.i("ServerResponse","onResponse successful");
-
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                Log.i("ServerResponse","onResponse successful, starting parsing the input.");
-                                Gson gson = new Gson();
-                                String response_body = response.body().string();
-                                Log.i("ServerResponse", response_body);
-//                                String[] namesArray = gson.fromJson(response_body, String[].class);
-
-
-
-
-//                                names = new ArrayList<>(Arrays.asList(namesArray));
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    });
-
-                }
-            }
-        });
-    }*/
 
     private void initSpinner() {
 
-        getTechnicianNamesFromServer();//todo return this.
-//        parseStringArray("usernameList","");//todo remove this
+        getTechnicianNamesFromServer();
         spinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, names));
     }
 
@@ -295,7 +249,6 @@ public class MainActivity extends AppCompatActivity {
 
         ID_Event = "6277d5e196756934bc8848c1";//todo remove this
 
-
         RequestBody requestBody = new FormBody.Builder()
                 .add("ID_Event", ID_Event)
                 .add("techName",technicianName)
@@ -321,7 +274,7 @@ public class MainActivity extends AppCompatActivity {
                             try {
                                 if(response.body().string().matches("success")){
                                     Toast.makeText(MainActivity.this, getString(R.string.update_info_in_server), Toast.LENGTH_LONG).show();
-                                    finish();//todo
+                                    finish();//todo test
                                 }
                             } catch (IOException e) {
                                 e.printStackTrace();
@@ -333,31 +286,5 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-
-//    private void sendTechnicianName() {
-//        String technicianName = spinner.getSelectedItem().toString();
-//        Log.i("Server","sending technician name "+technicianName);
-//
-//
-//
-//        // todo
-//    }
-
-
-    private void getTechnicianNamesFromServer2() {
-        names = new ArrayList<>();
-        names.add("Hilak");
-        names.add("DanielK");
-        names.add("PeterK");
-        names.add("SybilK");
-        //todo
-
-
-
-
-    }
-
-
 
 }
