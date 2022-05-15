@@ -30,6 +30,7 @@
         android:layout_height="wrap_content"
         android:text="Get Server Names"
         android:clickable="true"
+        android:visibility="gone"
         android:layout_gravity="center"
         android:layout_marginTop="100dp"
         android:id="@+id/btnGetReqeust"/>

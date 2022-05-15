@@ -7,4 +7,6 @@
     <string name="no">No</string>
     <string name="update_info_in_server">Successfully updated server</string>
 
+    <string name="choose_a_technician_name_in_spinner">Please choose a name</string>
+    <string name="user_send_empty_technician_name">"Please choose a technician name"</string>
 </resources>

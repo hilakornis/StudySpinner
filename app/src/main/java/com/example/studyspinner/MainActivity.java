@@ -4,8 +4,11 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -15,8 +18,6 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Properties;
 
 import com.google.gson.Gson;
 
@@ -51,20 +52,36 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        names = new ArrayList<>();
-
         findViewOfItems();
-        initSpinner();
-        initBtnAndAlertWindow();
-        setOnClickListernerServerButtons();
-
+        initItems();
 
     }
+
+    private void initItems() {
+        names = new ArrayList<>();
+        names.add(getString(R.string.choose_a_technician_name_in_spinner));
+
+
+
+        initSpinner();
+        initBtnAndAlertWindow();
+//        setOnClickListernerServerButtons();
+
+    }
+
+    private void findViewOfItems() {
+        btnConfirm = findViewById(R.id.btnConfirm);
+        spinner = findViewById(R.id.spinner);
+        btnGetReqeust = findViewById(R.id.btnGetReqeust);
+        btnPostReqeust = findViewById(R.id.btnPostReqeust);
+    }
+
 
     private void setOnClickListernerServerButtons() {
         btnGetReqeust.setOnClickListener(new View.OnClickListener() {
@@ -79,88 +96,14 @@ public class MainActivity extends AppCompatActivity {
         btnPostReqeust.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+//                isTechnicianNameLegal();
                 sendTechnicianName("");
 
             }
         });
     }
 
-    private void findViewOfItems() {
-        btnConfirm = findViewById(R.id.btnConfirm);
-        spinner = findViewById(R.id.spinner);
-        btnGetReqeust = findViewById(R.id.btnGetReqeust);
-        btnPostReqeust = findViewById(R.id.btnPostReqeust);
-    }
 
-    public void getTechnicianNamesFromServer(){
-        OkHttpClient client = new OkHttpClient();
-        String url = Constants.Server.Users.GetRequest.getAllUserNamesList;
-        Log.i(TAG,"getTechnicianNamesFromServer start");
-
-        Log.i(TAG,"url : " + url);
-//        Request request = new Request.Builder().url(url).get().build();
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
-
-
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                Log.i(TAG, "Response failed");
-                e.printStackTrace();
-
-            }
-
-            @Override
-            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                if(response.isSuccessful()){
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                Log.i(TAG,"onResponse successful, starting parsing the input.");
-                                Gson gson = new Gson();
-                                String response_body = response.body().string();
-                                //String response_body = "usernameList:[\"Assi\",\"Yakir\",\"Hila\",\"Boaz\"]";
-
-                                String fieldName = "usernameList";
-                                Log.i(TAG, response_body);
-
-                                parseStringArray(fieldName, response_body);
-
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    });
-
-                }
-            }
-        });
-    }
-
-    private void parseStringArray(String fieldName, String response_body) {
-        //todo: remove this:
-            response_body = "{\"usernameList\":[\"Assi\",\"Yakir\",\"Hila\",\"Boaz\",\"Idan\"]}";
-
-//        Log.i(TAG, response_body);
-        try {
-            JSONObject jo = new JSONObject(response_body);
-            JSONArray ja = jo.getJSONArray(fieldName);
-            for (int i = 0; i < ja.length(); i++) {
-                names.add(ja.getString(i));
-            }
-//            Log.i(TAG,"Output String array will be : ");
-//            for (String s : names) {
-//                Log.i(TAG, s);
-//            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-    }
 
     //todo remove:
     /*public void getTechnicianNamesFromServer_old(){
@@ -210,9 +153,71 @@ public class MainActivity extends AppCompatActivity {
 
     private void initSpinner() {
 
-//        getTechnicianNamesFromServer();//todo return this.
-        parseStringArray("usernameList","");//todo remove this
+        getTechnicianNamesFromServer();//todo return this.
+//        parseStringArray("usernameList","");//todo remove this
         spinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, names));
+    }
+
+    public void getTechnicianNamesFromServer(){
+        OkHttpClient client = new OkHttpClient();
+        String url = Constants.Server.Users.GetRequest.getAllUserNamesList;
+        Log.i(TAG,"getTechnicianNamesFromServer start");
+
+        Log.i(TAG,"url : " + url);
+//        Request request = new Request.Builder().url(url).get().build();
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                Log.i(TAG, "Response failed");
+                e.printStackTrace();
+
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                if(response.isSuccessful()){
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                Log.i(TAG,"onResponse successful, starting parsing the input.");
+                                String response_body = response.body().string();
+                                String fieldName = "usernameList";
+
+                                parseStringArray(fieldName, response_body);
+
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+
+                }
+            }
+        });
+    }
+
+    private void parseStringArray(String fieldName, String response_body) {
+
+//            response_body = "{\"usernameList\":[\"Assi\",\"Yakir\",\"Hila\",\"Boaz\",\"Idan\"]}";
+
+//        Log.i(TAG, response_body);
+        try {
+            JSONObject jo = new JSONObject(response_body);
+            JSONArray ja = jo.getJSONArray(fieldName);
+            for (int i = 0; i < ja.length(); i++) {
+                names.add(ja.getString(i));
+            }
+            spinner.setSelection(0);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private void initBtnAndAlertWindow() {
@@ -221,13 +226,17 @@ public class MainActivity extends AppCompatActivity {
         btnConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                CallAlertWindow();
+                if(isTechnicianNameLegal()){
+                    CallAlertWindow();
+                }
+
             }
         });
     }
 
     private void CallAlertWindow() {
         String chosenName = spinner.getSelectedItem().toString();
+
         String alertMessage = String.format(getString(R.string.technician_picked_to_deal_with_event_message), chosenName);
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle(R.string.technician_picked_to_deal_with_event)
@@ -237,7 +246,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
-                        sendTechnicianName("");
+                        sendTechnicianName("");//todo here put eventID
 
                     }
                 }).setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -250,9 +259,37 @@ public class MainActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
+    public boolean isTechnicianNameLegal(){
+        String chosenName = spinner.getSelectedItem().toString();
+        if(chosenName.equals(getString(R.string.choose_a_technician_name_in_spinner))){
+//            Toast.makeText(this, getString(R.string.user_send_empty_technician_name), Toast.LENGTH_SHORT).show();
+            showToastMessage(getString(R.string.user_send_empty_technician_name));
+
+            Log.i(TAG,"empty name");
+            return false;
+        }
+        return true;
+    }
+
+    public void showToastMessage(final String msg) {
+
+        /*new Handler(Looper.getMainLooper()).post( () ->
+                Toast.makeText(this, msg, Toast.LENGTH_SHORT).show());
+*/
+
+        Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
+        /*runOnUiThread(new Runnable() {            @Override
+            public void run() {
+                Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
+            }
+        });*/
+    }
 
     public void sendTechnicianName(String ID_Event){
         String technicianName = spinner.getSelectedItem().toString();
+
+
+
         Log.i("Server","sending technician name "+technicianName);
         OkHttpClient client = new OkHttpClient();
 
@@ -260,7 +297,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         RequestBody requestBody = new FormBody.Builder()
-                .add("_id", ID_Event)
+                .add("ID_Event", ID_Event)
                 .add("techName",technicianName)
                 .build();
 
@@ -272,6 +309,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 Log.i(TAG,"Connection with server failed");
+                e.printStackTrace();
             }
 
             @Override
@@ -283,7 +321,7 @@ public class MainActivity extends AppCompatActivity {
                             try {
                                 if(response.body().string().matches("success")){
                                     Toast.makeText(MainActivity.this, getString(R.string.update_info_in_server), Toast.LENGTH_LONG).show();
-                                    finish();
+                                    finish();//todo
                                 }
                             } catch (IOException e) {
                                 e.printStackTrace();
